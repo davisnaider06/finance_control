@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth';
-import transactionRoutes from './routes/transactions'; // (Arquivo que você já tem)
-import categoryRoutes from './routes/categories'; // (Arquivo que você já tem)
+import transactionRoutes from './routes/transaction'; 
+import categoryRoutes from './routes/categories'; 
 
 // Carrega variáveis de ambiente (necessário 'dotenv')
 // import * as dotenv from 'dotenv';

@@ -5,9 +5,9 @@ import { Pool } from 'pg';
 // (PGUSER, PGHOST, PGDATABASE, PGPASSWORD, PGPORT)
 // ou você pode passar uma connectionString.
 const pool = new Pool({
-  // Ex: connectionString: process.env.DATABASE_URL
-  // Se as variáveis de ambiente estiverem corretas,
-  // new Pool() já é o suficiente.
+  connectionString: process.env.DATABASE_URL
+  
+  
 });
 
 pool.on('connect', () => {
