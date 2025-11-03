@@ -5,6 +5,7 @@ import { RegisterPage } from './pages/RegisterPage'; // (Criaremos a seguir)
 import { DashboardPage } from './pages/DashboardPage'; // (Criaremos a seguir)
 import { PrivateRoute } from './components/PrivateRoute'; // (Você já tem na estrutura)
 
+
 function App() {
   return (
     <Routes>

@@ -1,30 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Importado para o logout
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/ui/Button';
-import { LogOut, PlusCircle, TrendingUp, TrendingDown } from 'lucide-react';
-
-// --- Tipos (Vamos movê-los para 'types/index.ts' mais tarde) ---
-interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  date: string; // ou Date
-  categoryId: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  icon: string; // (opcional)
-}
-// --- Fim dos Tipos ---
-
+import { LogOut, PlusCircle, TrendingUp, TrendingDown, Edit2, Trash2, Loader2 } from 'lucide-react';
+import { type Transaction, type Category } from '../types'; // Caminho padrão
+import { Modal } from '../components/ui/Modal';
+import { AddTransactionForm } from '../components/AddTransactionForm';
 
 /**
- * Componente de Cabeçalho do Dashboard
- * Mostra o nome do usuário e o botão de logout.
+ * Cabeçalho do Dashboard
  */
 const DashboardHeader = () => {
   const { user, logout } = useAuth();
@@ -54,8 +38,7 @@ const DashboardHeader = () => {
 };
 
 /**
- * Componente de Resumo Financeiro (Cards)
- * Mostra o saldo total, receitas e despesas.
+ * Cards de Resumo (Receita, Despesa, Saldo)
  */
 const SummaryCards = ({ income, expense }: { income: number; expense: number }) => {
   const balance = income - expense;
@@ -100,50 +83,104 @@ const SummaryCards = ({ income, expense }: { income: number; expense: number }) 
 };
 
 /**
- * Componente da Lista de Transações (Placeholder)
- * Irá listar as transações recentes.
+ * Componente da Lista de Transações (AGORA ATUALIZADO)
+ * Lista as transações reais e permite exclusão.
  */
-const TransactionList = ({ transactions }: { transactions: Transaction[] }) => {
+const TransactionList = ({ 
+  transactions, 
+  onDeleteTransaction 
+}: { 
+  transactions: Transaction[];
+  onDeleteTransaction: (id: string) => void;
+}) => {
+  
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  };
+  
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
   if (transactions.length === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-        <h3 className="text-lg font-semibold mb-2">Sem Transações</h3>
+        <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Sem Transações</h3>
         <p className="text-gray-500 dark:text-gray-400">Você ainda não adicionou nenhuma transação.</p>
-        <Button className="mt-4 w-auto">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Adicionar Primeira Transação
-        </Button>
+        {/* O botão de adicionar agora fica nas "Ações Rápidas" */}
       </div>
     );
   }
 
-  // TODO: Implementar a lista de transações
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-      <h3 className="text-lg font-semibold mb-4">Transações Recentes</h3>
-      {/* Aqui virá o map das transações */}
-      <p className="text-gray-500 dark:text-gray-400">Lista de transações (em breve)...</p>
+      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Transações Recentes</h3>
+      <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+        {transactions.map(tx => (
+          <li key={tx.id} className="flex flex-wrap items-center justify-between py-4 sm:flex-nowrap">
+            <div className="flex items-center space-x-4 w-full sm:w-auto">
+              <div className={`p-3 rounded-full ${tx.type === 'income' ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}`}>
+                {tx.type === 'income' ? 
+                  <TrendingUp className="h-5 w-5 text-green-500" /> : 
+                  <TrendingDown className="h-5 w-5 text-red-500" />
+                }
+              </div>
+              <div>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{tx.description}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {tx.categoryName} ・ {formatDate(tx.date)}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-2 mt-4 w-full sm:w-auto sm:mt-0 justify-end">
+              <span className={`font-semibold ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                {tx.type === 'income' ? '+' : '-'} {formatCurrency(tx.amount)}
+              </span>
+              <button 
+                onClick={() => onDeleteTransaction(tx.id)}
+                className="p-2 text-gray-400 hover:text-red-500 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
 
 
 /**
- * Página Principal do Dashboard
- * Organiza os componentes de cabeçalho, resumo e transações.
+ * Página Principal do Dashboard (ATUALIZADA)
+ * Gerencia o estado, o modal e os dados.
  */
 export function DashboardPage() {
-  const { token } = useAuth(); // Pegar o token para fazer chamadas de API
+  const { token } = useAuth();
   
   // Estado para armazenar dados financeiros
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Estado para o modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Totais calculados
-  const [totalIncome, setTotalIncome] = useState(0);
-  const [totalExpense, setTotalExpense] = useState(0);
+  // Totais calculados (derivados do estado 'transactions')
+  // Isso é melhor do que o useState, pois recalcula automaticamente
+  const totalIncome = transactions
+    .filter(tx => tx.type === 'income')
+    .reduce((acc, tx) => acc + tx.amount, 0);
+  const totalExpense = transactions
+    .filter(tx => tx.type === 'expense')
+    .reduce((acc, tx) => acc + tx.amount, 0);
+
 
   // Efeito para buscar os dados do backend ao carregar a página
   useEffect(() => {
@@ -157,35 +194,25 @@ export function DashboardPage() {
       setError(null);
       
       try {
-        // 1. Buscar transações
-        // Esta rota '/api/transactions' deve existir no seu backend
-        const transResponse = await fetch('/api/transactions', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        // 1. Buscar transações E categorias (em paralelo)
+        const [transResponse, catResponse] = await Promise.all([
+          fetch('/api/transactions', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }),
+          fetch('/api/categories', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+        ]);
+
         if (!transResponse.ok) throw new Error('Falha ao buscar transações');
+        if (!catResponse.ok) throw new Error('Falha ao buscar categorias');
+
         const transData: Transaction[] = await transResponse.json();
-        setTransactions(transData);
-
-        // 2. Buscar categorias (se necessário, ou pode ser em outro local)
-        // const catResponse = await fetch('/api/categories', {
-        //   headers: { 'Authorization': `Bearer ${token}` }
-        // });
-        // if (!catResponse.ok) throw new Error('Falha ao buscar categorias');
-        // const catData: Category[] = await catResponse.json();
-        // setCategories(catData);
-
-        // 3. Calcular totais (isso também pode vir do backend)
-        let income = 0;
-        let expense = 0;
-        transData.forEach(tx => {
-          if (tx.type === 'income') {
-            income += tx.amount;
-          } else {
-            expense += tx.amount;
-          }
-        });
-        setTotalIncome(income);
-        setTotalExpense(expense);
+        const catData: Category[] = await catResponse.json();
+        
+        // Inverte para mostrar as mais novas primeiro
+        setTransactions(transData.reverse()); 
+        setCategories(catData);
 
       } catch (err: unknown) {
         if (err instanceof Error) setError(err.message);
@@ -196,7 +223,38 @@ export function DashboardPage() {
     };
 
     fetchData();
-  }, [token]); // Depende do token para re-buscar se o login mudar
+  }, [token]); // Depende do token
+
+  // --- Funções de Callback ---
+  
+  const handleTransactionAdded = (newTransaction: Transaction) => {
+    // Adiciona a nova transação no topo da lista
+    setTransactions(prev => [newTransaction, ...prev]);
+  };
+  
+  const handleDeleteTransaction = async (id: string) => {
+    // Adicionar confirmação
+    if (!window.confirm("Tem certeza que deseja deletar esta transação?")) {
+        return;
+    }
+    
+    try {
+      const response = await fetch(`/api/transactions/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao deletar transação');
+      }
+      // Atualiza o estado local
+      setTransactions(prev => prev.filter(tx => tx.id !== id));
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
+      else setError('Erro ao deletar transação');
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
@@ -206,7 +264,7 @@ export function DashboardPage() {
         {/* Indicador de Loading ou Erro */}
         {loading && (
           <div className="flex justify-center items-center h-64">
-             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+             <Loader2 className="h-12 w-12 text-blue-500 animate-spin" />
           </div>
         )}
         
@@ -216,7 +274,7 @@ export function DashboardPage() {
           </div>
         )}
 
-        {/* Conteúdo principal (só mostra se não estiver carregando e sem erro inicial) */}
+        {/* Conteúdo principal */}
         {!loading && !error && (
           <>
             {/* Cards de Resumo */}
@@ -226,29 +284,47 @@ export function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 {/* Lista de Transações */}
-                <TransactionList transactions={transactions} />
+                <TransactionList 
+                  transactions={transactions} 
+                  onDeleteTransaction={handleDeleteTransaction} 
+                />
               </div>
               <div className="lg:col-span-1">
-                {/* (Placeholder) Formulário Rápido de Adição ou Gráficos */}
+                {/* Ações Rápidas (AGORA FUNCIONAL) */}
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg h-full">
-                  <h3 className="text-lg font-semibold mb-4">Ações Rápidas</h3>
-                  <Button className="w-full mb-4">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Ações Rápidas</h3>
+                  <Button 
+                    className="w-full mb-4"
+                    onClick={() => setIsModalOpen(true)} // Abre o modal
+                  >
                      <PlusCircle className="mr-2 h-4 w-4" />
-                     Nova Receita
+                     Nova Transação
                   </Button>
-                  <Button className="w-full bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700">
-                     <PlusCircle className="mr-2 h-4 w-4" />
-                     Nova Despesa
-                  </Button>
+                  {/* (Você pode adicionar um botão para "Gerenciar Categorias" aqui no futuro) */}
                 </div>
               </div>
             </div>
           </>
         )}
       </main>
+
+      {/* Modal de Nova Transação (Fora do main) */}
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        title="Adicionar Nova Transação"
+      >
+        <AddTransactionForm
+          categories={categories}
+          onTransactionAdded={handleTransactionAdded}
+          onClose={() => setIsModalOpen(false)}
+        />
+      </Modal>
+
     </div>
   );
 }
 
 // Exportação padrão para 'lazy loading' se necessário
 export default DashboardPage;
+

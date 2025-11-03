@@ -1,13 +1,37 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>Painel Financeiro</title>
+
+    <!-- 1. SCRIPT DO TAILWIND (CDN) -->
+    <!-- Isso carrega o Tailwind e faz todas as classes funcionarem -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 2. SCRIPT DE CONFIGURAÇÃO (Opcional, mas habilita o Modo Escuro) -->
+    <script>
+      // Habilita o modo escuro baseado na classe 'dark' no <html>
+      tailwind.config = {
+        darkMode: 'class'
+      }
+    </script>
+
+    <!-- 3. SCRIPT PARA EVITAR "FLASH" DO TEMA -->
+    <!-- Isso lê o tema do localStorage ANTES da página carregar -->
+    <script>
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    </script>
+
   </head>
-  <body>
+  <body class="bg-white dark:bg-gray-950">
     <div id="root"></div>
+    <!-- 4. Carrega seu App React -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
