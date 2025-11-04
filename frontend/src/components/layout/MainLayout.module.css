@@ -1,0 +1,18 @@
+/* Em: frontend/src/components/layout/MainLayout.module.css */
+
+.layout {
+  display: flex;
+}
+
+.content {
+  /* O conteúdo principal começa "depois" da sidebar (que tem 250px) */
+  margin-left: 250px; 
+  /* Ocupa todo o resto da largura */
+  flex-grow: 1; 
+  /* O padding interno da área de conteúdo */
+  padding: 2rem; 
+  /* Garante que ele possa rolar se for muito grande */
+  min-height: 100vh;
+  /* O fundo cinza claro que você quer */
+  background-color: #f0f2f5; 
+}

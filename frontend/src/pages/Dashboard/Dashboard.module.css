@@ -1,0 +1,57 @@
+/* Em: frontend/src/pages/Dashboard/Dashboard.module.css */
+
+.dashboardContainer h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 colunas */
+  gap: 1.5rem; /* Espaço entre os cards */
+}
+
+.summaryCard {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.summaryCard h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #777;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.summaryCard p {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.loading, .error {
+  font-size: 1.25rem;
+  color: #777;
+}
+
+.currency {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.positive {
+  color: #198754; /* Um verde "sucesso" */
+}
+
+.negative {
+  color: #dc3545; /* Um vermelho "perigo" */
+}
+
+.neutral {
+  color: #333; /* Cor padrão (preto) */
+}
