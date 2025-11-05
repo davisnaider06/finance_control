@@ -92,7 +92,7 @@ export function AccountsPage() {
     return <div className={styles.error}>{error}</div>;
   }
 
-  // 6. O JSX
+  
   return (
     <div className={styles.accountsContainer}>
       <div className={styles.header}>

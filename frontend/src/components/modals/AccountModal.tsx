@@ -1,6 +1,6 @@
 // Em: frontend/src/components/modals/AccountModal.tsx
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import api from '../../services/api';
 import styles from './Modal.module.css'; // Reutilizamos o CSS!
 
