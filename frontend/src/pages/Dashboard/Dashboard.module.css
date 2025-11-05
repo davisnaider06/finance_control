@@ -3,7 +3,7 @@
 .dashboardContainer h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
 }
 
@@ -14,16 +14,17 @@
 }
 
 .summaryCard {
-  background-color: #ffffff;
+  background-color: var(--bg-primary); /* DE: #ffffff */
+  box-shadow: var(--shadow);
   padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s, box-shadow 0.2s;
 }
 
 .summaryCard h3 {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #777;
+  color: var(--text-secondary);
   margin-bottom: 0.5rem;
   text-transform: uppercase;
 }
@@ -31,7 +32,6 @@
 .summaryCard p {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #333;
 }
 
 .loading, .error {
@@ -45,13 +45,27 @@
 }
 
 .positive {
-  color: #198754; /* Um verde "sucesso" */
+  color: var(--color-green); /* DE: #198754 */
 }
-
 .negative {
-  color: #dc3545; /* Um vermelho "perigo" */
+  color: var(--color-red); /* DE: #dc3545 */
+}
+.neutral {
+  color: var(--text-primary); /* DE: #333 */
 }
 
-.neutral {
-  color: #333; /* Cor padrão (preto) */
+.chartCard {
+  background-color: var(--bg-primary); /* DE: #ffffff */
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+.chartCard h2 {
+  color: var(--text-primary); /* DE: #333 */
+  /* ... */
+}
+.loading, .error {
+  color: var(--text-secondary); /* DE: #777 */
 }

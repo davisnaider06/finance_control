@@ -1,0 +1,151 @@
+/* Em: frontend/src/components/modals/Modal.module.css */
+
+/* O fundo escuro semi-transparente */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* A caixa branca do modal */
+.content {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 500px; /* Largura máxima do modal */
+  position: relative;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.modalHeader h2 {
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modalBody {
+  padding: 1rem 0;
+}
+
+/* Estilo do toggle Receita/Despesa */
+.typeToggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.typeButton {
+  flex: 1; /* Ocupa metade do espaço */
+  padding: 0.75rem;
+  border: none;
+  background-color: #f8f9fa;
+  color: #555;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* O botão que está ATIVO */
+.typeButton.active {
+  background-color: #0d6efd; /* Azul */
+  color: white;
+}
+
+/* Cores específicas para Receita/Despesa */
+.typeButton.revenue.active {
+  background-color: #198754; /* Verde */
+}
+.typeButton.expense.active {
+  background-color: #dc3545; /* Vermelho */
+}
+
+/* Grupos de formulário (label + input) */
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 colunas */
+  gap: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ocupa 2 colunas */
+.formGroup.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.formGroup label {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.formGroup input,
+.formGroup select {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end; /* Alinha o botão à direita */
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.saveButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  background-color: #0d6efd; /* Azul Padrão */
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.saveButton:hover {
+  background-color: #0b5ed7;
+}
+
+/* Classe de erro para o formulário */
+.formError {
+  color: #dc3545;
+  margin-top: 1rem;
+  text-align: center;
+}

@@ -1,0 +1,92 @@
+.transactionsContainer {
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.addButton {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  background-color: #0d6efd; 
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.addButton:hover {
+  background-color: #0b5ed7;
+}
+
+.tableCard {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.tableCard table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableCard th,
+.tableCard td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.tableCard th {
+  background-color: #f8f9fa; 
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #777;
+  text-transform: uppercase;
+}
+
+.tableCard td {
+  color: #333;
+  font-weight: 500;
+}
+
+
+.tableCard tr:last-child td {
+  border-bottom: none;
+}
+
+/* Centraliza o placeholder "Nenhuma transação" */
+.tableCard tr td[colSpan="5"] {
+  text-align: center;
+  color: #999;
+  padding: 2rem;
+}
+
+
+.positive {
+  color: #198754 !important;
+  font-weight: 700 !important;
+}
+
+.negative {
+  color: #dc3545 !important;
+  font-weight: 700 !important;
+}
+
+.error {
+  font-size: 1.25rem;
+  color: #dc3545;
+}

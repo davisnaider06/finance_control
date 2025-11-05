@@ -2,35 +2,36 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
+// <<< MUDANÇA 1: Adicionar a "index signature" [key: string]: any
+// Isso diz ao TypeScript que, além de 'name' e 'value',
+// o objeto pode ter qualquer outra chave, o que satisfaz o 'recharts'.
 interface PieChartData {
   name: string;
   value: number;
+  [key: string]: any; 
 }
 
 interface ExpensePieChartProps {
   data: PieChartData[];
 }
 
-// Cores para os gomos do gráfico. Pode adicionar mais.
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF1919'];
 
 export const ExpensePieChart = ({ data }: ExpensePieChartProps) => {
   return (
-    // ResponsiveContainer é ESSENCIAL. 
-    // Ele faz o gráfico se adaptar ao tamanho do 'div' pai.
     <ResponsiveContainer width="100%" height={250}>
       <PieChart>
         <Pie
           data={data}
-          dataKey="value" // A 'key' que definimos no SQL
-          nameKey="name"   // A 'key' que definimos no SQL
+          dataKey="value"
+          nameKey="name"
           cx="50%"
           cy="50%"
           outerRadius={80}
           fill="#8884d8"
-          label={(entry) => entry.name} // Mostra o nome da categoria
+          label={(entry) => entry.name}
         >
-          {data.map((entry, index) => (
+          {data.map((_entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>

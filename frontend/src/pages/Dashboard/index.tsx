@@ -1,9 +1,9 @@
-// Em: frontend/src/pages/Dashboard/index.tsx
+
 
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
 import styles from './Dashboard.module.css';
-import { formatCurrency } from '../../utils/formaters';
+import { formatCurrency } from '../../utils/formatters';
 import { ExpensePieChart } from '../../components/charts/ExpensePieChart';
 import { BalanceLineChart } from '../../components/charts/BalanceLineChart';
 
@@ -14,8 +14,10 @@ interface DashboardSummary {
   expense_this_month: string;
   // (Adicione outros campos do summary se houver)
 }
-import { PieChartData } from '../../components/charts/ExpensePieChart';
-
+interface PieChartData {
+  name: string;
+  value: number;
+}
 interface LineChartData {
   name: string; // A data, ex: "04/11"
   balance: number;
@@ -51,10 +53,20 @@ export function Dashboard() {
           api.get('/dashboard/balance-evolution'),
         ]);
 
+        const parsedPieData = pieRes.data.map((item: { name: string, value: string }) => ({
+          name: item.name,
+          value: parseFloat(item.value)
+        }));
+
+        const parsedLineData = lineRes.data.map((item: { name: string, balance: string }) => ({
+          name: item.name,
+          balance: parseFloat(item.balance)
+        }));
+
         // Salva os dados nos seus respectivos estados
         setSummary(summaryRes.data);
-        setPieData(pieRes.data);
-        setLineData(lineRes.data);
+        setPieData(parsedPieData);
+        setLineData(parsedLineData);
 
       } catch (err) {
         console.error("Erro ao buscar dados do dashboard:", err);
@@ -118,23 +130,27 @@ export function Dashboard() {
           </p>
         </div>
         
-        {/* Card de Despesas COM o Gráfico de Pizza */}
+        {/* Card de Despesas*/}
         <div className={styles.summaryCard}>
           <h3>Despesa (Este Mês)</h3>
           <p className={`${styles.currency} ${styles.negative}`}>
             {formatCurrency(expense_this_month)}
           </p>
-          {/* O Gráfico de Pizza vai aqui! */}
-          <ExpensePieChart data={pieData} />
         </div>
 
       </div>
 
-      {/* --- GRÁFICO DE LINHA (Linha 2) --- */}
+      {/* GRÁFICO DE LINHA  */}
       <div className={styles.chartCard}>
         <h2>Balanço (Últimos 30 dias)</h2>
         <BalanceLineChart data={lineData} />
       </div>
+
+      <div className={styles.chartCard}>
+        <h2>Gastos por Categoria</h2> 
+        <ExpensePieChart data={pieData} />
+      </div>
+
 
     </div>
   );

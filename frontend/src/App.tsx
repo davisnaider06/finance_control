@@ -6,6 +6,9 @@ import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import { PrivateRoute } from './components/PrivateRoutes';
 import { MainLayout } from './components/layout/MainLayout';
+import { TransactionsPage } from './pages/Transactions';
+import { AccountsPage } from './pages/Accounts';
+import { CategoriesPage } from './pages/Categories';
 
 function App() {
   return (
@@ -13,24 +16,14 @@ function App() {
       {/* Rotas Públicas */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-
-      {/* Rotas Privadas
-        1. O <PrivateRoute> checa se o usuário está logado.
-        2. Se estiver, ele renderiza o <MainLayout>.
-        3. O <MainLayout> renderiza a Sidebar e um <Outlet>.
-        4. O React Router coloca as rotas filhas (Dashboard, etc) dentro do <Outlet>.
-      */}
       <Route element={<PrivateRoute />}>
         <Route element={<MainLayout />}>
-          
           <Route path="/" element={<Dashboard />} />
-          {/* (Quando criar a página de transações, ela irá aqui)
-            <Route path="/transactions" element={<TransactionsPage />} /> 
-          */}
-
+          <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/accounts" element={<AccountsPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
         </Route>
       </Route>
-
     </Routes>
   );
 }

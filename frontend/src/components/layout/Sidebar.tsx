@@ -15,15 +15,24 @@ export const Sidebar = () => {
       <ul className={styles.navList}>
         <li>
           <NavLink to="/" className={({ isActive }) => isActive ? styles.activeLink : ''}>
-            {/* Ícone */} Visão Geral
+            Visão Geral
           </NavLink>
         </li>
         <li>
           <NavLink to="/transactions" className={({ isActive }) => isActive ? styles.activeLink : ''}>
-            {/* Ícone */} Transações
+             Transações
           </NavLink>
         </li>
-        {/* Adicionar mais links aqui (Contas, Orçamentos, etc) */}
+       <li>
+          <NavLink to="/accounts" className={({ isActive }) => isActive ? styles.activeLink : ''}>
+             Contas
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/categories" className={({ isActive }) => isActive ? styles.activeLink : ''}>
+            Categorias
+          </NavLink>
+        </li>
       </ul>
 
       <div className={styles.sidebarFooter}>
@@ -34,6 +43,7 @@ export const Sidebar = () => {
           Sair
         </button>
       </div>
+
     </nav>
   );
 };

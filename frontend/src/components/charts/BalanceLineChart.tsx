@@ -1,7 +1,7 @@
 // Em: frontend/src/components/charts/BalanceLineChart.tsx
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { formatCurrency } from '../../utils/formaters'; 
+import { formatCurrency } from '../../utils/formatters'; 
 
 interface LineChartData {
   name: string; // A data, ex: "04/11"

@@ -1,0 +1,81 @@
+/* Em: frontend/src/components/ThemeToggle/ThemeToggle.module.css */
+
+.toggleContainer {
+  display: flex;
+  align-items: center;
+  /* justify-content: flex-end; <-- Removido, o 'margin-left: auto' no label fará isso */
+  width: auto; /* Ajusta a largura para o conteúdo */
+  /* padding: 0.5rem 1rem; <-- Removido para o controle do layout ser na sidebar */
+  color: var(--sidebar-text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  /* background-color: transparent !important; /* Garantir que não tenha fundo */
+}
+
+/* Remover o hover azul */
+.toggleContainer:hover {
+  background-color: transparent; /* Certifica que não muda de cor ao passar o mouse */
+}
+
+.toggleLabel {
+  margin-right: 0.75rem; /* Espaço entre o texto e o switch */
+  user-select: none; /* Impede que o texto seja selecionado */
+  margin-left: auto; /* Empurra o label para a esquerda e o switch para a direita */
+}
+
+/* O Switch em si */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 45px; /* Largura do switch */
+  height: 25px; /* Altura do switch */
+}
+
+/* Esconde o input checkbox padrão */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* A "alavanca" do switch */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--text-secondary); /* Cor de fundo do slider (desligado) */
+  transition: 0.4s;
+  border-radius: 25px; /* Para as bordas arredondadas */
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 19px; /* Altura da bolinha */
+  width: 19px;  /* Largura da bolinha */
+  left: 3px;    /* Posição inicial da bolinha */
+  bottom: 3px;  /* Posição inicial da bolinha */
+  background-color: white; /* Cor da bolinha */
+  transition: 0.4s;
+  border-radius: 50%; /* Para a bolinha ser redonda */
+}
+
+/* Quando o checkbox está CHECADO (toggle ligado) */
+input:checked + .slider {
+  background-color: var(--color-blue); /* Cor de fundo do slider (ligado) */
+}
+
+/* Move a bolinha para a direita quando o checkbox está CHECADO */
+input:checked + .slider:before {
+  transform: translateX(20px); /* Move a bolinha */
+}
+
+/* Estilo para quando a bolinha está focada */
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--color-blue);
+}
