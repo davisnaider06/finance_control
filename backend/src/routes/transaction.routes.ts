@@ -1,18 +1,25 @@
-// Em: backend/src/routes/transaction.routes.ts
-
 import { Router } from 'express';
-import { createTransaction, getTransactions } from '../controllers/transactionController';
+import { 
+  createTransaction, 
+  getTransactions,
+  updateTransaction,
+  deleteTransaction
+} from '../controllers/transactionController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
 
-// Aplica o middleware de autenticação
 router.use(authMiddleware);
 
-// POST /api/transactions - Criar nova transação
+// POST /api/transactions
 router.post('/', createTransaction);
 
-// GET /api/transactions - Buscar transações
+// GET /api/transactions
 router.get('/', getTransactions);
+
+router.put('/:id', updateTransaction);
+
+// DELETE /api/transactions/:id 
+router.delete('/:id', deleteTransaction);
 
 export default router;

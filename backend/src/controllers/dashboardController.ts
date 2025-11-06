@@ -136,3 +136,56 @@ export const getDashboardSummary = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: 'Erro interno do servidor' });
   }
 };
+
+const GET_BUDGET_PROGRESS_QUERY = `
+    -- 1. Pega os orçamentos definidos para o mês ATUAL
+    WITH CurrentMonthBudgets AS (
+        SELECT 
+            b.category_id,
+            c.name as category_name,
+            c.icon as category_icon,
+            b.amount as budgeted_amount
+        FROM budgets b
+        JOIN categories c ON b.category_id = c.id
+        WHERE b.user_id = $1
+          -- Pega o orçamento definido para o dia 1 do mês atual
+          AND b.month_date = DATE_TRUNC('month', CURRENT_DATE)
+    ),
+    
+    -- 2. Pega os gastos REAIS do mês ATUAL, agrupados por categoria
+    CurrentMonthSpending AS (
+        SELECT
+            t.category_id,
+            SUM(ABS(t.amount)) as spent_amount
+        FROM transactions t
+        WHERE t.user_id = $1
+          AND t.amount < 0 -- Apenas despesas
+          AND t.date >= DATE_TRUNC('month', CURRENT_DATE)
+          AND t.date < (DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month')
+        GROUP BY t.category_id
+    )
+
+    -- 3. Junta Orçado (Budgets) com Gasto (Spending)
+    SELECT
+        cb.category_name,
+        cb.category_icon,
+        cb.budgeted_amount,
+        -- Se não houver gastos, retorna 0
+        COALESCE(cms.spent_amount, 0) as spent_amount
+    FROM CurrentMonthBudgets cb
+    -- LEFT JOIN para incluir orçamentos que ainda não tiveram gastos
+    LEFT JOIN CurrentMonthSpending cms ON cb.category_id = cms.category_id
+    ORDER BY cb.category_name;
+`;
+
+export const getBudgetProgress = async (req: AuthRequest, res: Response) => {
+  const userId = req.userId;
+  try {
+    const result = await pool.query(GET_BUDGET_PROGRESS_QUERY, [userId]);
+    // Retorna um array com o progresso de cada orçamento
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar progresso dos orçamentos:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};

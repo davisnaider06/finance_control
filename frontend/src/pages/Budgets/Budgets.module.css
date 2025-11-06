@@ -1,0 +1,116 @@
+/* Em: frontend/src/pages/Budgets/Budgets.module.css */
+
+.budgetsContainer {
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  color: var(--text-primary);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.addButton {
+  margin-top: 30px;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--color-blue);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.addButton:hover {
+  background-color: #0b5ed7;
+}
+
+/* Estilo para a lista/grid de cards */
+.budgetList {
+  display: grid;
+  /* Cria colunas de 300px, mas que se ajustam */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.budgetCard {
+  background-color: var(--bg-primary);
+  box-shadow: var(--shadow);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.2s;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.categoryInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.categoryInfo h3 {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.categoryIcon {
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+}
+
+.budgetActions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.25rem;
+  margin-left: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+.budgetActions button:hover {
+  background-color: var(--bg-secondary);
+}
+
+.editButton {
+  color: var(--text-secondary);
+}
+
+.deleteButton {
+  color: var(--color-red);
+}
+
+.cardBody span {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.cardBody p {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 0.25rem;
+}
+
+.loading, .error {
+  color: var(--text-secondary);
+  padding: 1rem;
+}

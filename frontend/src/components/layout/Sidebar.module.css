@@ -39,6 +39,9 @@
   text-decoration: none;
   transition: background-color 0.2s, color 0.2s;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .navList li a:hover {

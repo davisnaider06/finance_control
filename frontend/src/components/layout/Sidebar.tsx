@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Sidebar.module.css';
+import { DynamicIcon } from '../DynamicIcon';
 
 
 export const Sidebar = () => {
@@ -15,22 +16,32 @@ export const Sidebar = () => {
       <ul className={styles.navList}>
         <li>
           <NavLink to="/" className={({ isActive }) => isActive ? styles.activeLink : ''}>
-            Visão Geral
+            <DynamicIcon name="FaChartPie" />
+            <span>Visão Geral</span>
           </NavLink>
         </li>
         <li>
           <NavLink to="/transactions" className={({ isActive }) => isActive ? styles.activeLink : ''}>
-             Transações
+            <DynamicIcon name="FaExchangeAlt" />
+            <span>Transações</span>
           </NavLink>
         </li>
-       <li>
+        <li>
           <NavLink to="/accounts" className={({ isActive }) => isActive ? styles.activeLink : ''}>
-             Contas
+            <DynamicIcon name="FaLandmark" />
+            <span>Contas</span>
           </NavLink>
         </li>
         <li>
           <NavLink to="/categories" className={({ isActive }) => isActive ? styles.activeLink : ''}>
-            Categorias
+            <DynamicIcon name="FaTags" />
+            <span>Categorias</span>
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/budgets" className={({ isActive }) => isActive ? styles.activeLink : ''}>
+            <DynamicIcon name="FaBullseye" /> {/* Ícone de "Alvo" */}
+            <span>Orçamentos</span>
           </NavLink>
         </li>
       </ul>

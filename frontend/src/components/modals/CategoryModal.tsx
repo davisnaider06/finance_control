@@ -1,10 +1,9 @@
-// Em: frontend/src/components/modals/CategoryModal.tsx
-
 import { useState, useEffect, type FormEvent } from 'react';
 import api from '../../services/api';
-import styles from './Modal.module.css'; // Reutilizamos o CSS!
+import styles from './Modal.module.css'; 
+import {IconPicker} from '../IconPicker';
 
-// 1. --- Interfaces ---
+
 interface Category {
   id: number;
   name: string;
@@ -15,35 +14,31 @@ interface Category {
 interface CategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCategorySaved: () => void; // Para recarregar a lista
-  categoryToEdit: Category | null; // A categoria a ser editada
+  onCategorySaved: () => void; 
+  categoryToEdit: Category | null; 
 }
 
-// 2. --- Componente ---
 export const CategoryModal = ({ isOpen, onClose, onCategorySaved, categoryToEdit }: CategoryModalProps) => {
-  // 3. --- Estados do Formulário ---
   const [name, setName] = useState('');
   const [type, setType] = useState<'revenue' | 'expense'>('expense');
-  const [icon, setIcon] = useState(''); // (Por enquanto, um campo de texto simples)
+  const [selectedIcon, setSelectedIcon] = useState(''); 
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 4. --- Lógica de Edição ---
   useEffect(() => {
     if (categoryToEdit) {
-      // Modo Edição
+     
       setName(categoryToEdit.name);
       setType(categoryToEdit.type);
-      setIcon(categoryToEdit.icon || '');
+      setSelectedIcon(categoryToEdit.icon || '');
     } else {
-      // Modo Adição
+      
       setName('');
       setType('expense');
-      setIcon('');
+      setSelectedIcon('');
     }
   }, [categoryToEdit, isOpen]);
 
-  // 5. --- Função de 'Submit' ---
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -52,24 +47,21 @@ export const CategoryModal = ({ isOpen, onClose, onCategorySaved, categoryToEdit
     const categoryData = {
       name: name,
       type: type,
-      icon: icon || null, // Se estiver vazio, envia null
+      icon: selectedIcon|| null,
     };
 
     try {
       if (categoryToEdit) {
-        // MODO EDIÇÃO (PUT)
         await api.put(`/categories/${categoryToEdit.id}`, categoryData);
       } else {
-        // MODO ADIÇÃO (POST)
         await api.post('/categories', categoryData);
       }
       
-      onCategorySaved(); // Avisa a página para recarregar
-      handleClose();       // Fecha e limpa o modal
+      onCategorySaved(); 
+      handleClose();       
 
     } catch (err: any) {
       console.error("Erro ao salvar categoria:", err);
-      // Pega erros de validação do backend (ex: email já existe)
       if (err.response && err.response.data && err.response.data.message) {
         setError(err.response.data.message);
       } else {
@@ -80,11 +72,11 @@ export const CategoryModal = ({ isOpen, onClose, onCategorySaved, categoryToEdit
     }
   };
 
-  // 6. --- Função de Fechar ---
+
   const handleClose = () => {
     setName('');
     setType('expense');
-    setIcon('');
+    setSelectedIcon('');
     setError(null);
     onClose();
   };
@@ -134,15 +126,12 @@ export const CategoryModal = ({ isOpen, onClose, onCategorySaved, categoryToEdit
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="categoryIcon">Ícone (Opcional)</label>
-                <input
-                  type="text"
-                  id="categoryIcon"
-                  value={icon}
-                  onChange={(e) => setIcon(e.target.value)}
-                  placeholder="Ex: car, home, food"
-                />
-              </div>
+              <label>Ícone</label>
+              <IconPicker 
+                selectedValue={selectedIcon}
+                onSelect={setSelectedIcon}
+              />
+            </div>
             </div>
 
             {error && <p className={styles.formError}>{error}</p>}

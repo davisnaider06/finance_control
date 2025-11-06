@@ -1,5 +1,3 @@
-// Em: frontend/src/App.tsx
-
 import { Routes, Route } from 'react-router-dom';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
@@ -9,6 +7,7 @@ import { MainLayout } from './components/layout/MainLayout';
 import { TransactionsPage } from './pages/Transactions';
 import { AccountsPage } from './pages/Accounts';
 import { CategoriesPage } from './pages/Categories';
+import { BudgetsPage } from './pages/Budgets';
 
 function App() {
   return (
@@ -22,6 +21,7 @@ function App() {
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/accounts" element={<AccountsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/budgets" element={<BudgetsPage />} />
         </Route>
       </Route>
     </Routes>

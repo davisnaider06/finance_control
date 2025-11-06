@@ -6,6 +6,7 @@ import styles from './Dashboard.module.css';
 import { formatCurrency } from '../../utils/formatters';
 import { ExpensePieChart } from '../../components/charts/ExpensePieChart';
 import { BalanceLineChart } from '../../components/charts/BalanceLineChart';
+import { BudgetProgressCard } from '../../components/BudgetProgress';
 
 // --- Interfaces dos dados ---
 interface DashboardSummary {
@@ -23,6 +24,22 @@ interface LineChartData {
   balance: number;
 }
 
+interface BudgetProgressData {
+  category_name: string;
+  category_icon: string | null;
+  budgeted_amount: string; // Vem como string
+  spent_amount: string; // Vem como string
+}
+
+interface Budget {
+  id: number;
+  category_id: number;
+  amount: string;
+  month_date: string;
+  category_name: string;
+  category_icon: string | null;
+}
+
 // --- Funções Helper de Estilo ---
 const getCurrencyClass = (value: number | string) => {
   const numericValue = typeof value === 'string' ? parseFloat(value) : value;
@@ -36,6 +53,9 @@ export function Dashboard() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [pieData, setPieData] = useState<PieChartData[]>([]);
   const [lineData, setLineData] = useState<LineChartData[]>([]);
+
+  const [budgetProgress, setBudgetProgress] = useState<BudgetProgressData[]>([]);
+  
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,10 +67,11 @@ export function Dashboard() {
         setError(null);
 
         // Usamos Promise.all para buscar tudo em paralelo
-        const [summaryRes, pieRes, lineRes] = await Promise.all([
+        const [summaryRes, pieRes, lineRes, budgetRes] = await Promise.all([
           api.get('/dashboard/summary'),
           api.get('/dashboard/expense-by-category'),
           api.get('/dashboard/balance-evolution'),
+          api.get('/dashboard/budget-progress')
         ]);
 
         const parsedPieData = pieRes.data.map((item: { name: string, value: string }) => ({
@@ -67,6 +88,7 @@ export function Dashboard() {
         setSummary(summaryRes.data);
         setPieData(parsedPieData);
         setLineData(parsedLineData);
+        setBudgetProgress(budgetRes.data);
 
       } catch (err) {
         console.error("Erro ao buscar dados do dashboard:", err);
@@ -140,17 +162,34 @@ export function Dashboard() {
 
       </div>
 
-      {/* GRÁFICO DE LINHA  */}
-      <div className={styles.chartCard}>
-        <h2>Balanço (Últimos 30 dias)</h2>
-        <BalanceLineChart data={lineData} />
+      <div className={styles.chartsGrid}>
+        
+        <div className={styles.chartCard}>
+          <h2>Balanço (Últimos 30 dias)</h2>
+          <BalanceLineChart data={lineData} />
+        </div>
+
+        <div className={styles.chartCard}>
+          <h2>Gastos por Categoria</h2>
+          <ExpensePieChart data={pieData} />
+        </div>
       </div>
 
-      <div className={styles.chartCard}>
-        <h2>Gastos por Categoria</h2> 
-        <ExpensePieChart data={pieData} />
-      </div>
-
+      <div className={styles.chartCard}> 
+          <h2>Orçamentos (Este Mês)</h2>
+          
+          {budgetProgress.map((budget) => (
+            <BudgetProgressCard
+              key={budget.category_name}
+              name={budget.category_name}
+              icon={budget.category_icon}
+             
+              spent={parseFloat(budget.spent_amount)}
+              budgeted={parseFloat(budget.budgeted_amount)}
+            />
+          ))}
+        </div>
+      
 
     </div>
   );

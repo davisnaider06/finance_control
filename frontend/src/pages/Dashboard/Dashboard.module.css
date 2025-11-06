@@ -55,7 +55,7 @@
 }
 
 .chartCard {
-  background-color: var(--bg-primary); /* DE: #ffffff */
+  background-color: var(--bg-primary);
   box-shadow: var(--shadow);
   padding: 1.5rem;
   border-radius: 8px;
@@ -66,6 +66,15 @@
   color: var(--text-primary); /* DE: #333 */
   /* ... */
 }
+
+.chartsGrid {
+  display: grid;
+ 
+  grid-template-columns: 6fr 4fr; 
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
 .loading, .error {
   color: var(--text-secondary); /* DE: #777 */
 }
