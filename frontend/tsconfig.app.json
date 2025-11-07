@@ -24,5 +24,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "src/vite-env.d.ts" // <<< A CORREÇÃO DOS ERROS DE .CSS E IMPORT.META
+  ]
 }
