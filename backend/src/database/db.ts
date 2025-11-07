@@ -17,7 +17,7 @@ if (process.env.DATABASE_URL) {
   };
 } else {
   // Estamos em desenvolvimento local
-  config.host = process.env.DB_HOST;
+  config.host = '127.0.0.1'; 
   config.port = Number(process.env.DB_PORT);
   config.user = process.env.DB_USER;
   config.password = process.env.DB_PASSWORD;
