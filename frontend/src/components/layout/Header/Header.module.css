@@ -1,0 +1,32 @@
+/* O container principal do cabeçalho */
+.header {
+  display: flex;
+  justify-content: space-between; /* Título na esquerda, toggle na direita */
+  align-items: center;
+  padding: 1rem 2rem; /* Mesmo padding do conteúdo da página */
+  height: 70px; /* Altura fixa para o cabeçalho */
+  
+  /* Cores do tema */
+  background-color: var(--bg-primary); /* Branco ou Cinza-escuro */
+  border-bottom: 1px solid var(--border-color);
+  
+  /* Garante que ele fique acima do scroll da página, se houver */
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.title {
+  color: var(--text-primary);
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+/* Wrapper para o toggle, para alinhá-lo */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}

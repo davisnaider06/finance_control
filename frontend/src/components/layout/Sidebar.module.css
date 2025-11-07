@@ -8,8 +8,9 @@
   position: fixed; /* Fica fixo na tela */
   left: 0;
   top: 0;
- background-color: var(--sidebar-bg);
+  background-color: var(--sidebar-bg);
   color: var(--sidebar-text);
+  
 
 }
 

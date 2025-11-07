@@ -82,7 +82,6 @@ export function CategoriesPage() {
   return (
     <div className={styles.categoriesContainer}>
       <div className={styles.header}>
-        <h1>Minhas Categorias</h1>
         {/* <<< MUDANÇA: Botão agora abre o modal */}
         <button onClick={handleOpenAddModal} className={styles.addButton}>
           Adicionar Categoria

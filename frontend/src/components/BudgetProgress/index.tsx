@@ -1,5 +1,3 @@
-// Em: frontend/src/components/BudgetProgress/index.tsx
-
 import styles from './BudgetProgress.module.css';
 import { DynamicIcon } from '../DynamicIcon';
 import { formatCurrency } from '../../utils/formatters';
@@ -9,25 +7,28 @@ interface BudgetProgressProps {
   icon: string | null;
   spent: number;
   budgeted: number;
+  month_date?: string | null;
 }
 
-export const BudgetProgressCard = ({ name, icon, spent, budgeted }: BudgetProgressProps) => {
-  // 1. Calcula a porcentagem gasta (ex: 150 / 400 = 0.375)
-  // Usamos Math.max(0, ...) e Math.min(100, ...) para garantir que fique entre 0% e 100%
+const formatMonthYear = (dateString: string) => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  } catch (e) {
+    return dateString;
+  }
+};
+
+export const BudgetProgressCard = ({ name, icon, spent, budgeted, month_date }: BudgetProgressProps) => {
+
   const percent = budgeted > 0 ? Math.max(0, (spent / budgeted) * 100) : 0;
-  
-  // Limita a barra em 100% (mesmo que gaste 200%)
   const barPercent = Math.min(100, percent);
-
-  // 2. Calcula o valor restante
   const remaining = budgeted - spent;
-
-  // 3. Define a cor da barra de progresso
   let barColorClass = styles.fillGreen;
   if (percent > 90) {
-    barColorClass = styles.fillRed; // Mais de 90% gasto = Vermelho
+    barColorClass = styles.fillRed; 
   } else if (percent > 70) {
-    barColorClass = styles.fillYellow; // Mais de 70% gasto = Amarelo
+    barColorClass = styles.fillYellow;
   }
 
   return (
@@ -37,8 +38,7 @@ export const BudgetProgressCard = ({ name, icon, spent, budgeted }: BudgetProgre
       </div>
       <div className={styles.content}>
         <div className={styles.header}>
-          <h4>{name}</h4>
-          {/* Mostra a porcentagem (ex: 38%) */}
+          <h4>{name} {month_date && `(${formatMonthYear(month_date)})`}</h4>
           <span>{percent.toFixed(0)}%</span>
         </div>
         

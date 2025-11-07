@@ -5,7 +5,7 @@ import api from '../../services/api';
 import styles from './Budgets.module.css';
 import { DynamicIcon } from '../../components/DynamicIcon'; // Para o ícone da categoria
 import { formatCurrency } from '../../utils/formatters'; // Para o valor
-import { BudgetModal } from '../../components/modals/BudgetModal';
+import { BudgetModal } from '../../components/modals/BudgetModal'; // O Modal
 
 // 1. Define a 'forma' do Orçamento (como vem da API)
 interface Budget {
@@ -34,12 +34,9 @@ export function BudgetsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Estados do modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
-
-  // (Estados do modal virão aqui)
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
 
   // 3. Função de busca de dados
   const fetchBudgets = useCallback(async () => {
@@ -75,6 +72,7 @@ export function BudgetsPage() {
     }
   };
 
+  // Funções para abrir/fechar o modal
   const handleOpenAddModal = () => {
     setEditingBudget(null);
     setIsModalOpen(true);
@@ -104,7 +102,6 @@ export function BudgetsPage() {
   return (
     <div className={styles.budgetsContainer}>
       <div className={styles.header}>
-        <h1>Meus Orçamentos</h1>
         <button onClick={handleOpenAddModal} className={styles.addButton}>
           Adicionar Orçamento
         </button>
@@ -146,15 +143,17 @@ export function BudgetsPage() {
             </div>
           ))
         ) : (
-          <p>Nenhum orçamento cadastrado.</p>
+          !isLoading && <p>Nenhum orçamento cadastrado.</p>
         )}
+        {isLoading && <div className={styles.loading}>Carregando...</div>}
       </div>
-            <BudgetModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                onBudgetSaved={handleBudgetSaved}
-                budgetToEdit={editingBudget}
-            />
+
+      <BudgetModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onBudgetSaved={handleBudgetSaved}
+        budgetToEdit={editingBudget}
+      />
     </div>
   );
 }

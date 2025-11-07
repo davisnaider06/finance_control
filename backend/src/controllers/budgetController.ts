@@ -6,19 +6,46 @@ import pool from '../database/db';
 export const getBudgets = async (req: AuthRequest, res: Response) => {
   const userId = req.userId;
 
+  // ESTA É A MESMA CONSULTA QUE ACABAMOS DE CRIAR NA TAREFA 36
+  const GET_ALL_BUDGETS_WITH_PROGRESS_QUERY = `
+    WITH AllBudgets AS (
+        SELECT 
+            b.id,
+            b.category_id,
+            c.name as category_name,
+            c.icon as category_icon,
+            b.amount as budgeted_amount,
+            b.month_date
+        FROM budgets b
+        JOIN categories c ON b.category_id = c.id
+        WHERE b.user_id = $1
+    ),
+    AllSpending AS (
+        SELECT
+            t.category_id,
+            DATE_TRUNC('month', t.date) as transaction_month,
+            SUM(ABS(t.amount)) as spent_amount
+        FROM transactions t
+        WHERE t.user_id = $1
+          AND t.amount < 0
+        GROUP BY t.category_id, DATE_TRUNC('month', t.date)
+    )
+    SELECT
+        ab.id,
+        ab.category_name,
+        ab.category_icon,
+        ab.month_date,
+        ab.budgeted_amount,
+        COALESCE(als.spent_amount, 0) as spent_amount
+    FROM AllBudgets ab
+    LEFT JOIN AllSpending als 
+      ON ab.category_id = als.category_id 
+      AND ab.month_date = als.transaction_month
+    ORDER BY ab.month_date DESC, ab.category_name;
+  `;
+
   try {
-    // Vamos buscar os orçamentos e JÁ ADICIONAR o nome da categoria
-    const budgets = await pool.query(
-      `SELECT 
-         b.*, 
-         c.name as category_name,
-         c.icon as category_icon
-       FROM budgets b
-       JOIN categories c ON b.category_id = c.id
-       WHERE b.user_id = $1
-       ORDER BY b.month_date DESC, c.name ASC`,
-      [userId]
-    );
+    const budgets = await pool.query(GET_ALL_BUDGETS_WITH_PROGRESS_QUERY, [userId]);
     res.status(200).json(budgets.rows);
   } catch (error) {
     console.error('Erro ao buscar orçamentos:', error);

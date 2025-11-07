@@ -99,7 +99,6 @@ export function TransactionsPage() {
   return (
     <div className={styles.transactionsContainer}>
       <div className={styles.header}>
-        <h1>Transações</h1>
         <button className={styles.addButton} onClick={handleOpenAddModal}>Adicionar Transação</button>
       </div>
 

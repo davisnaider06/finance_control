@@ -96,7 +96,6 @@ export function AccountsPage() {
   return (
     <div className={styles.accountsContainer}>
       <div className={styles.header}>
-        <h1>Minhas Contas</h1>
         <button onClick={handleOpenAddModal} className={styles.addButton}>
           Adicionar Conta
         </button>

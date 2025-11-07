@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
 import styles from './Dashboard.module.css';
@@ -8,39 +6,26 @@ import { ExpensePieChart } from '../../components/charts/ExpensePieChart';
 import { BalanceLineChart } from '../../components/charts/BalanceLineChart';
 import { BudgetProgressCard } from '../../components/BudgetProgress';
 
-// --- Interfaces dos dados ---
 interface DashboardSummary {
   current_balance: string;
   revenue_this_month: string;
   expense_this_month: string;
-  // (Adicione outros campos do summary se houver)
 }
-interface PieChartData {
+interface ChartData {
   name: string;
   value: number;
-}
-interface LineChartData {
-  name: string; // A data, ex: "04/11"
   balance: number;
 }
 
-interface BudgetProgressData {
-  category_name: string;
-  category_icon: string | null;
-  budgeted_amount: string; // Vem como string
-  spent_amount: string; // Vem como string
-}
-
-interface Budget {
+interface BudgetData {
   id: number;
-  category_id: number;
-  amount: string;
-  month_date: string;
   category_name: string;
   category_icon: string | null;
+  budgeted_amount: number;
+  spent_amount: number;
+  month_date: string;
 }
 
-// --- Funções Helper de Estilo ---
 const getCurrencyClass = (value: number | string) => {
   const numericValue = typeof value === 'string' ? parseFloat(value) : value;
   if (numericValue > 0) return styles.positive;
@@ -48,47 +33,57 @@ const getCurrencyClass = (value: number | string) => {
   return styles.neutral;
 };
 
-export function Dashboard() {
-  // --- Estados ---
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [pieData, setPieData] = useState<PieChartData[]>([]);
-  const [lineData, setLineData] = useState<LineChartData[]>([]);
+const formatMonthYear = (dateString: string) => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  } catch (e) {
+    return dateString;
+  }
+};
 
-  const [budgetProgress, setBudgetProgress] = useState<BudgetProgressData[]>([]);
-  
+const parseNumericData = (data: any[]) => data.map(item => ({
+  ...item,
+  value: parseFloat(item.value || '0'),
+  balance: parseFloat(item.balance || '0'),
+  budgeted_amount: parseFloat(item.budgeted_amount || '0'),
+  spent_amount: parseFloat(item.spent_amount || '0'),
+}));
+
+
+export function Dashboard() {
+
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [pieData, setPieData] = useState<ChartData[]>([]);
+  const [lineData, setLineData] = useState<ChartData[]>([]);
+  const [monthBudgets, setMonthBudgets] = useState<BudgetData[]>([]);
+  const [allBudgets, setAllBudgets] = useState<BudgetData[]>([]); 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // --- Efeito para Buscar TODOS os dados ---
+  
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
         setError(null);
 
-        // Usamos Promise.all para buscar tudo em paralelo
-        const [summaryRes, pieRes, lineRes, budgetRes] = await Promise.all([
+        const [summaryRes, pieRes, lineRes, monthBudgetRes, allBudgetsRes] = await Promise.all([
           api.get('/dashboard/summary'),
           api.get('/dashboard/expense-by-category'),
           api.get('/dashboard/balance-evolution'),
-          api.get('/dashboard/budget-progress')
+          api.get('/dashboard/budget-progress'), 
+          api.get('/budgets'),                   
         ]);
 
-        const parsedPieData = pieRes.data.map((item: { name: string, value: string }) => ({
-          name: item.name,
-          value: parseFloat(item.value)
-        }));
 
-        const parsedLineData = lineRes.data.map((item: { name: string, balance: string }) => ({
-          name: item.name,
-          balance: parseFloat(item.balance)
-        }));
-
-        // Salva os dados nos seus respectivos estados
         setSummary(summaryRes.data);
-        setPieData(parsedPieData);
-        setLineData(parsedLineData);
-        setBudgetProgress(budgetRes.data);
+
+        setPieData(parseNumericData(pieRes.data));
+        setLineData(parseNumericData(lineRes.data));
+        
+        setMonthBudgets(parseNumericData(monthBudgetRes.data));
+        setAllBudgets(parseNumericData(allBudgetsRes.data)); 
 
       } catch (err) {
         console.error("Erro ao buscar dados do dashboard:", err);
@@ -99,37 +94,29 @@ export function Dashboard() {
     };
 
     fetchDashboardData();
-  }, []); // O array vazio '[]' garante que isso rode só uma vez
+  }, []);
 
-  // --- Renderização Condicional (Loading, Erro) ---
+
   if (isLoading) {
     return <div className={styles.loading}>Carregando dados...</div>;
   }
-
   if (error) {
     return <div className={styles.error}>{error}</div>;
   }
-
-  // Se passou por 'isLoading' e 'error', 'summary' não deve ser nulo
-  // mas é uma boa prática checar.
   if (!summary) {
     return <div>Nenhum dado encontrado.</div>;
   }
 
-  // --- O JSX Final ---
+
   const { 
     current_balance, 
     revenue_this_month, 
     expense_this_month 
   } = summary;
-
   const month_balance = parseFloat(revenue_this_month) + parseFloat(expense_this_month);
 
   return (
     <div className={styles.dashboardContainer}>
-      <h1>Visão Geral</h1>
-      
-      {/* --- GRID DE CARDS DE RESUMO (Linha 1) --- */}
       <div className={styles.summaryGrid}>
         
         <div className={styles.summaryCard}>
@@ -152,45 +139,58 @@ export function Dashboard() {
           </p>
         </div>
         
-        {/* Card de Despesas*/}
         <div className={styles.summaryCard}>
           <h3>Despesa (Este Mês)</h3>
           <p className={`${styles.currency} ${styles.negative}`}>
             {formatCurrency(expense_this_month)}
           </p>
         </div>
-
       </div>
 
       <div className={styles.chartsGrid}>
-        
         <div className={styles.chartCard}>
           <h2>Balanço (Últimos 30 dias)</h2>
           <BalanceLineChart data={lineData} />
         </div>
-
         <div className={styles.chartCard}>
-          <h2>Gastos por Categoria</h2>
+          <h2>Gastos por Categoria (Mês)</h2>
           <ExpensePieChart data={pieData} />
         </div>
       </div>
 
-      <div className={styles.chartCard}> 
+      {monthBudgets.length > 0 && (
+        <div className={styles.chartCard}>
           <h2>Orçamentos (Este Mês)</h2>
           
-          {budgetProgress.map((budget) => (
+          {monthBudgets.map((budget) => (
             <BudgetProgressCard
-              key={budget.category_name}
+              key={`month-${budget.id}`}
               name={budget.category_name}
               icon={budget.category_icon}
-             
-              spent={parseFloat(budget.spent_amount)}
-              budgeted={parseFloat(budget.budgeted_amount)}
+              spent={budget.spent_amount}
+              budgeted={budget.budgeted_amount} 
+              month_date={null}
             />
           ))}
         </div>
-      
+      )}
 
+      {allBudgets.length > 0 && (
+        <div className={styles.chartCard}>
+          <h2>Todos os Orçamentos</h2>
+          
+          {allBudgets.map((budget) => (
+            <BudgetProgressCard
+              key={`all-${budget.id}`}
+              name={budget.category_name}
+              icon={budget.category_icon}
+              spent={budget.spent_amount}
+              budgeted={budget.budgeted_amount} 
+              month_date={budget.month_date} 
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
