@@ -1,9 +1,9 @@
 import { Pool, PoolConfig } from 'pg';
 import dotenv from 'dotenv';
 
-// Carrega as variáveis de ambiente do .env
-dotenv.config();
-
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 // Objeto de configuração
 const config: PoolConfig = {};
 
