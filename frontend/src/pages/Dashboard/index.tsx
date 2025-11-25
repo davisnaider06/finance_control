@@ -131,9 +131,6 @@ export function Dashboard() {
           <p className={`${styles.currency} ${styles.positive}`}>
             {formatCurrency(revenue_this_month)}
           </p>
-          <p className={`${styles.currency} ${styles.negative}`}>
-            {formatCurrency(expense_this_month)}
-          </p>
           <p className={`${styles.currency} ${getCurrencyClass(month_balance)}`}>
             {formatCurrency(month_balance)}
           </p>
