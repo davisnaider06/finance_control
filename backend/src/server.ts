@@ -16,12 +16,14 @@ const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
   origin: [
+    'https://financy.netlify.app', 
     process.env.CORS_ORIGIN_URL || 'http://localhost:5173',
     'http://localhost:5173'
-  ],
+  ].filter(Boolean),
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); 
 
 app.use(express.json());
 
