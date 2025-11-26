@@ -80,6 +80,11 @@
   color: white;
 }
 
+.typeButton.savings.active {
+  background-color: #0d6efd;
+  color: white;
+}
+
 /* Cores específicas para Receita/Despesa */
 .typeButton.revenue.active {
   background-color: #198754; /* Verde */

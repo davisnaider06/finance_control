@@ -40,7 +40,7 @@ export const Sidebar = () => {
         </li>
         <li>
           <NavLink to="/budgets" className={({ isActive }) => isActive ? styles.activeLink : ''}>
-            <DynamicIcon name="FaBullseye" /> {/* Ícone de "Alvo" */}
+            <DynamicIcon name="FaPiggyBank" /> 
             <span>Orçamentos</span>
           </NavLink>
         </li>

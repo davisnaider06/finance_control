@@ -52,17 +52,17 @@ export const BudgetModal = ({ isOpen, onClose, onBudgetSaved, budgetToEdit }: Bu
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 4. --- Efeito para buscar categorias (só busca despesas!)
+
   useEffect(() => {
     if (isOpen && categories.length === 0) {
       const fetchCategories = async () => {
         try {
           const response = await api.get('/categories');
           // Orçamentos são (geralmente) para Despesas
-          const expenseCategories = response.data.filter(
-            (cat: Category) => cat.type === 'expense'
+          const validCategories = response.data.filter(
+            (cat: Category) => cat.type === 'expense'  || cat.type === 'savings'
           );
-          setCategories(expenseCategories);
+          setCategories(validCategories);
         } catch (err) {
           console.error("Erro ao buscar categorias:", err);
         }

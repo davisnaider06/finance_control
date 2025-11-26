@@ -1,5 +1,3 @@
-// Em: backend/src/controllers/dashboardController.ts
-
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import pool from '../database/db';
@@ -31,7 +29,6 @@ export const getExpenseByCategory = async (req: AuthRequest, res: Response) => {
 };
 
 
-// Consulta para o Gráfico de Linha (Evolução do Saldo nos Últimos 30 dias)
 const GET_BALANCE_EVOLUTION_QUERY = `
 WITH 
 Days AS (
@@ -82,8 +79,6 @@ export const getBalanceEvolution = async (req: AuthRequest, res: Response) => {
   }
 };
 
-
-// Esta é a consulta "mágica"
 const GET_DASHBOARD_SUMMARY_QUERY = `
 WITH M_Base AS (
     -- 1. Pega o saldo inicial de todas as contas
@@ -126,7 +121,6 @@ export const getDashboardSummary = async (req: AuthRequest, res: Response) => {
   try {
     const summaryResult = await pool.query(GET_DASHBOARD_SUMMARY_QUERY, [userId]);
     
-    // O resultado da query complexa estará na primeira linha
     const summaryData = summaryResult.rows[0];
 
     res.status(200).json(summaryData);
@@ -138,44 +132,45 @@ export const getDashboardSummary = async (req: AuthRequest, res: Response) => {
 };
 
 const GET_BUDGET_PROGRESS_QUERY = `
-    -- 1. Pega os orçamentos definidos para o mês ATUAL
     WITH CurrentMonthBudgets AS (
         SELECT 
             b.category_id,
             c.name as category_name,
             c.icon as category_icon,
-            b.amount as budgeted_amount
+            c.type as category_type, -- Precisamos saber o tipo (expense ou savings)
+            b.amount as budgeted_amount,
+            b.id
         FROM budgets b
         JOIN categories c ON b.category_id = c.id
         WHERE b.user_id = $1
-          -- Pega o orçamento definido para o dia 1 do mês atual
           AND b.month_date = DATE_TRUNC('month', CURRENT_DATE)
     ),
     
-    -- 2. Pega os gastos REAIS do mês ATUAL, agrupados por categoria
+    -- 2. Pega os gastos/depósitos REAIS do mês ATUAL
     CurrentMonthSpending AS (
         SELECT
             t.category_id,
             SUM(ABS(t.amount)) as spent_amount
         FROM transactions t
         WHERE t.user_id = $1
-          AND t.amount < 0 -- Apenas despesas
+          -- Considera tanto despesas quanto poupança (ambos saem da conta corrente)
+          AND (t.amount < 0 OR t.category_id IN (SELECT id FROM categories WHERE type = 'savings'))
           AND t.date >= DATE_TRUNC('month', CURRENT_DATE)
           AND t.date < (DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month')
         GROUP BY t.category_id
     )
 
-    -- 3. Junta Orçado (Budgets) com Gasto (Spending)
+    -- 3. Junta tudo
     SELECT
+        cb.id,
         cb.category_name,
         cb.category_icon,
+        cb.category_type,
         cb.budgeted_amount,
-        -- Se não houver gastos, retorna 0
         COALESCE(cms.spent_amount, 0) as spent_amount
     FROM CurrentMonthBudgets cb
-    -- LEFT JOIN para incluir orçamentos que ainda não tiveram gastos
     LEFT JOIN CurrentMonthSpending cms ON cb.category_id = cms.category_id
-    ORDER BY cb.category_name;
+    ORDER BY cb.category_type DESC, cb.category_name; 
 `;
 
 export const getBudgetProgress = async (req: AuthRequest, res: Response) => {

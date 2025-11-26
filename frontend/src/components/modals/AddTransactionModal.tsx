@@ -27,7 +27,7 @@ interface Account {
 interface Category {
   id: number;
   name: string;
-  type: 'revenue' | 'expense';
+  type: 'revenue' | 'expense' | 'savings';
 }
 
 
@@ -44,7 +44,7 @@ export const AddTransactionModal = ({
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   
-  const [transactionType, setTransactionType] = useState<'expense' | 'revenue'>('expense');
+  const [transactionType, setTransactionType] = useState<'expense' | 'revenue' | 'savings'>('expense');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
@@ -118,7 +118,7 @@ export const AddTransactionModal = ({
     }
 
     let numericAmount = parseFloat(amount);
-    if (transactionType === 'expense' && numericAmount > 0) {
+   if ((transactionType === 'expense' || transactionType === 'savings') && numericAmount > 0) {
       numericAmount = numericAmount * -1;
     }
     if (transactionType === 'revenue' && numericAmount < 0) {
@@ -191,6 +191,13 @@ export const AddTransactionModal = ({
                 onClick={() => setTransactionType('revenue')}
               >
                 Receita
+              </button>
+              <button 
+                type="button"
+                className={`${styles.typeButton} ${styles.savings} ${transactionType === 'savings' ? styles.active : ''}`}
+                onClick={() => setTransactionType('savings')}
+              >
+                Cofrinho
               </button>
             </div>
 

@@ -7,7 +7,7 @@ import {IconPicker} from '../IconPicker';
 interface Category {
   id: number;
   name: string;
-  type: 'revenue' | 'expense';
+  type: 'revenue' | 'expense' | 'savings';
   icon: string | null;
 }
 
@@ -20,7 +20,7 @@ interface CategoryModalProps {
 
 export const CategoryModal = ({ isOpen, onClose, onCategorySaved, categoryToEdit }: CategoryModalProps) => {
   const [name, setName] = useState('');
-  const [type, setType] = useState<'revenue' | 'expense'>('expense');
+  const [type, setType] = useState<'revenue' | 'expense' | 'savings'>('expense');
   const [selectedIcon, setSelectedIcon] = useState(''); 
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -111,17 +111,17 @@ export const CategoryModal = ({ isOpen, onClose, onCategorySaved, categoryToEdit
               />
             </div>
 
-            <div className={styles.formGrid}>
-              <div className={styles.formGroup}>
+            <div className={styles.formGroup}>
                 <label htmlFor="categoryType">Tipo</label>
                 <select 
                   id="categoryType"
                   value={type}
-                  onChange={(e) => setType(e.target.value as 'revenue' | 'expense')}
+                  onChange={(e) => setType(e.target.value as 'revenue' | 'expense' | 'savings')}
                   required
                 >
                   <option value="expense">Despesa</option>
                   <option value="revenue">Receita</option>
+                  <option value="savings">Poupança / Objetivo</option> 
                 </select>
               </div>
 
