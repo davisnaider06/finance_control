@@ -1,158 +1,172 @@
-// Em: frontend/src/pages/Budgets/index.tsx
-
 import { useState, useEffect, useCallback } from 'react';
 import api from '../../services/api';
 import styles from './Budgets.module.css';
-import { DynamicIcon } from '../../components/DynamicIcon'; // Para o ícone da categoria
-import { formatCurrency } from '../../utils/formatters'; // Para o valor
-import { BudgetModal } from '../../components/modals/BudgetModal'; // O Modal
+import { DynamicIcon } from '../../components/DynamicIcon';
+import { formatCurrency } from '../../utils/formatters';
+import { BudgetModal } from '../../components/modals/BudgetModal';
+import { ReserveMoneyModal, TargetObjective } from '../../components/modals/ReserveMoneyModal';
 
-// 1. Define a 'forma' do Orçamento (como vem da API)
-interface Budget {
+interface Objective {
   id: number;
   category_id: number;
-  amount: string;
+  amount: string; 
   month_date: string;
-  category_name: string; // Vem do JOIN que fizemos no backend
+  category_name: string;
   category_icon: string | null;
-}
+  category_type: 'expense' | 'savings';
+ }
 
-// Helper para formatar o mês (ex: 2025-11-01 -> Novembro/2025)
 const formatMonthYear = (dateString: string) => {
   try {
     const date = new Date(dateString);
-    // Adiciona timeZone 'UTC' para evitar problemas de fuso horário
     return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-  } catch (e) {
-    return dateString;
-  }
+  } catch (e) { return dateString; }
 };
 
 export function BudgetsPage() {
-  // 2. Estados
-  const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [objectives, setObjectives] = useState<Objective[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  
+  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
+  const [editingObjective, setEditingObjective] = useState<Objective | null>(null);
+  const [isReserveModalOpen, setIsReserveModalOpen] = useState(false);
+  const [targetForReservation, setTargetForReservation] = useState<TargetObjective | null>(null);
 
-  // Estados do modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
-
-  // 3. Função de busca de dados
-  const fetchBudgets = useCallback(async () => {
+  const fetchObjectives = useCallback(async () => {
     try {
       setIsLoading(true);
-      setError(null);
       const response = await api.get('/budgets');
-      setBudgets(response.data);
+      setObjectives(response.data);
     } catch (err) {
-      console.error("Erro ao buscar orçamentos:", err);
-      setError("Não foi possível carregar os orçamentos.");
+      console.error("Erro ao buscar objetivos:", err);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // 4. Efeito para buscar os dados na montagem
   useEffect(() => {
-    fetchBudgets();
-  }, [fetchBudgets]);
+    fetchObjectives();
+  }, [fetchObjectives]);
 
-  // 5. Função de Excluir
-  const handleDelete = async (budgetId: number) => {
-    if (window.confirm("Tem certeza que deseja excluir este orçamento?")) {
-      try {
-        await api.delete(`/budgets/${budgetId}`);
-        // Se deu certo, atualiza a lista
-        fetchBudgets(); 
-      } catch (err) {
-        console.error("Erro ao excluir orçamento:", err);
-        alert("Não foi possível excluir o orçamento.");
-      }
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Tem certeza que deseja excluir este objetivo/orçamento?")) {
+      await api.delete(`/budgets/${id}`);
+      fetchObjectives();
     }
   };
 
-  // Funções para abrir/fechar o modal
-  const handleOpenAddModal = () => {
-    setEditingBudget(null);
-    setIsModalOpen(true);
+  const openManageModal = (obj?: Objective) => {
+    setEditingObjective(obj || null);
+    setIsManageModalOpen(true);
   };
 
-  const handleOpenEditModal = (budget: Budget) => {
-    setEditingBudget(budget);
-    setIsModalOpen(true);
+  const openReserveModal = (obj: Objective) => {
+    setTargetForReservation({
+      id: obj.id,
+      name: obj.category_name,
+      category_id: obj.category_id
+    });
+    setIsReserveModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingBudget(null);
-  };
+  const savingsObjectives = objectives.filter(o => o.category_type === 'savings');
+  const expenseBudgets = objectives.filter(o => o.category_type === 'expense');
 
-  const handleBudgetSaved = () => {
-    fetchBudgets();
-  };
-
-  if (isLoading) {
-    return <div className={styles.loading}>Carregando orçamentos...</div>;
-  }
-  if (error) {
-    return <div className={styles.error}>{error}</div>;
-  }
+  if (isLoading) return <div className="loading">Carregando...</div>;
 
   return (
     <div className={styles.budgetsContainer}>
       <div className={styles.header}>
-        <button onClick={handleOpenAddModal} className={styles.addButton}>
-          Adicionar Orçamento
+        <h1>Meus Objetivos e Orçamentos</h1>
+        <button onClick={() => openManageModal()} className={styles.addButton}>
+          <DynamicIcon name="FaPlus" style={{marginRight: 8}} />
+          Novo Objetivo/Orçamento
         </button>
       </div>
 
+
+      <h2 className={styles.sectionTitle} style={{ color: 'var(--savings-color)' }}>
+        <DynamicIcon name="FaPiggyBank" style={{ marginRight: 10 }} />
+        Meus Cofrinhos
+      </h2>
       <div className={styles.budgetList}>
-        {budgets.length > 0 ? (
-          budgets.map(budget => (
-            <div key={budget.id} className={styles.budgetCard}>
-              
+        {savingsObjectives.length > 0 ? (
+          savingsObjectives.map(obj => (
+            <div key={obj.id} className={`${styles.budgetCard} ${styles.savingsCard}`}>
               <div className={styles.cardHeader}>
                 <div className={styles.categoryInfo}>
-                  <span className={styles.categoryIcon}>
-                    <DynamicIcon name={budget.category_icon || 'FaQuestionCircle'} />
+                  <span className={styles.categoryIcon} style={{ backgroundColor: 'var(--savings-color)' }}>
+                    <DynamicIcon name={obj.category_icon || 'FaPiggyBank'} style={{ color: 'white' }} />
                   </span>
-                  <h3>{budget.category_name}</h3>
+                  <div>
+                    <h3>{obj.category_name}</h3>
+                    <span className={styles.monthLabel}>{formatMonthYear(obj.month_date)}</span>
+                  </div>
                 </div>
                 <div className={styles.budgetActions}>
-                  <button 
-                    onClick={() => handleOpenEditModal(budget)}
-                    className={styles.editButton}
-                  >
-                    ✏️
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(budget.id)} 
-                    className={styles.deleteButton}
-                  >
-                    🗑️
-                  </button>
+                  <button onClick={() => openManageModal(obj)} className={styles.iconButton}>✏️</button>
+                  <button onClick={() => handleDelete(obj.id)} className={styles.iconButton}>🗑️</button>
                 </div>
               </div>
               
               <div className={styles.cardBody}>
-                <span>{formatMonthYear(budget.month_date)}</span>
-                <p>{formatCurrency(budget.amount)}</p>
+                <p className={styles.metaLabel}>Meta do mês:</p>
+                <p className={styles.amountValue} style={{ color: 'var(--savings-color)' }}>
+                  {formatCurrency(obj.amount)}
+                </p>
+                <button 
+                  className={styles.reserveButton}
+                  onClick={() => openReserveModal(obj)}
+                >
+                  <DynamicIcon name="FaCoins" /> Reservar Dinheiro
+                </button>
               </div>
-
             </div>
           ))
         ) : (
-          !isLoading && <p>Nenhum orçamento cadastrado.</p>
+          <p className={styles.emptyState}>Nenhum cofrinho criado para este mês.</p>
         )}
-        {isLoading && <div className={styles.loading}>Carregando...</div>}
       </div>
-
+      {expenseBudgets.length > 0 && (
+        <>
+          <h2 className={styles.sectionTitle} style={{ marginTop: '2rem' }}>Orçamentos de Despesas</h2>
+          <div className={styles.budgetList}>
+            {expenseBudgets.map(budget => (
+              <div key={budget.id} className={styles.budgetCard}>
+                <div className={styles.cardHeader}>
+                  <div className={styles.categoryInfo}>
+                    <span className={styles.categoryIcon}>
+                      <DynamicIcon name={budget.category_icon || 'FaShoppingCart'} />
+                    </span>
+                    <h3>{budget.category_name}</h3>
+                  </div>
+                  <div className={styles.budgetActions}>
+                     <button onClick={() => openManageModal(budget)} className={styles.iconButton}>✏️</button>
+                     <button onClick={() => handleDelete(budget.id)} className={styles.iconButton}>🗑️</button>
+                  </div>
+                </div>
+                <div className={styles.cardBody}>
+                  <span>{formatMonthYear(budget.month_date)}</span>
+                  <p>{formatCurrency(budget.amount)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
       <BudgetModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onBudgetSaved={handleBudgetSaved}
-        budgetToEdit={editingBudget}
+        isOpen={isManageModalOpen}
+        onClose={() => { setIsManageModalOpen(false); setEditingObjective(null); }}
+        onBudgetSaved={fetchObjectives}
+        budgetToEdit={editingObjective}
+      />
+      <ReserveMoneyModal
+        isOpen={isReserveModalOpen}
+        onClose={() => { setIsReserveModalOpen(false); setTargetForReservation(null); }}
+        onReserveSuccess={() => {
+          fetchObjectives(); 
+        }}
+        targetObjective={targetForReservation}
       />
     </div>
   );
