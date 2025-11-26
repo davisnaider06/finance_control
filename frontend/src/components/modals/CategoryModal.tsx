@@ -135,7 +135,6 @@ export const CategoryModal = ({ isOpen, onClose, onCategorySaved, categoryToEdit
             </div>
 
             {error && <p className={styles.formError}>{error}</p>}
-          </div>
 
           <div className={styles.modalFooter}>
             <button type="submit" className={styles.saveButton} disabled={isLoading}>
@@ -143,8 +142,7 @@ export const CategoryModal = ({ isOpen, onClose, onCategorySaved, categoryToEdit
             </button>
           </div>
         </form>
-
       </div>
     </div>
-  );
-};
+  )
+}
