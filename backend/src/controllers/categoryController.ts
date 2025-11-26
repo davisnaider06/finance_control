@@ -4,20 +4,22 @@ import pool from '../database/db';
 
 // Criar uma nova categoria
 export const createCategory = async (req: AuthRequest, res: Response) => {
-  const { name, type, icon } = req.body; 
+  const { name, type, icon } = req.body;
   const userId = req.userId;
 
   if (!name || !type) {
     return res.status(400).json({ message: 'Nome e tipo são obrigatórios.' });
   }
-  if (type !== 'revenue' && type !== 'expense') {
-    return res.status(400).json({ message: "Tipo deve ser 'revenue' (receita) ou 'expense' (despesa)." });
+  
+  // <<< CORREÇÃO AQUI: Adicionamos 'savings' na validação
+  if (type !== 'revenue' && type !== 'expense' && type !== 'savings') {
+    return res.status(400).json({ message: "Tipo inválido. Deve ser 'revenue', 'expense' ou 'savings'." });
   }
 
   try {
     const newCategory = await pool.query(
       'INSERT INTO categories (user_id, name, type, icon) VALUES ($1, $2, $3, $4) RETURNING *',
-      [userId, name, type, icon || null] // Usa 'icon' se for enviado, senão null
+      [userId, name, type, icon || null]
     );
     res.status(201).json(newCategory.rows[0]);
   } catch (error) {
@@ -31,7 +33,6 @@ export const getCategories = async (req: AuthRequest, res: Response) => {
   const userId = req.userId;
 
   try {
-    // Busca separando por tipo, o que facilita o front
     const categories = await pool.query(
       'SELECT * FROM categories WHERE user_id = $1 ORDER BY type, name',
       [userId]
@@ -42,16 +43,20 @@ export const getCategories = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: 'Erro interno do servidor' });
   }
 };
+
+// Atualizar uma Categoria (Editar)
 export const updateCategory = async (req: AuthRequest, res: Response) => {
-  const { id } = req.params; // ID da categoria (da URL)
+  const { id } = req.params;
   const { name, type, icon } = req.body;
   const userId = req.userId;
 
   if (!name || !type) {
     return res.status(400).json({ message: 'Nome e tipo são obrigatórios.' });
   }
-  if (type !== 'revenue' && type !== 'expense') {
-    return res.status(400).json({ message: "Tipo deve ser 'revenue' ou 'expense'." });
+  
+  // <<< CORREÇÃO AQUI TAMBÉM: Adicionamos 'savings'
+  if (type !== 'revenue' && type !== 'expense' && type !== 'savings') {
+    return res.status(400).json({ message: "Tipo inválido. Deve ser 'revenue', 'expense' ou 'savings'." });
   }
 
   try {
@@ -90,15 +95,12 @@ export const deleteCategory = async (req: AuthRequest, res: Response) => {
     }
 
     res.status(200).json({ message: 'Categoria excluída com sucesso.' });
-  } catch (error: any) { // 'any' para checar o 'code' do erro
-    // Erro 23503 é 'foreign key violation' (violação de chave estrangeira)
-    // Isso acontece se a categoria AINDA ESTIVER SENDO USADA por uma transação.
+  } catch (error: any) {
     if (error.code === '23503') {
       return res.status(400).json({ 
         message: 'Não é possível excluir esta categoria, pois ela já está sendo usada em transações.' 
       });
     }
-    
     console.error('Erro ao excluir categoria:', error);
     res.status(500).json({ message: 'Erro interno do servidor' });
   }
