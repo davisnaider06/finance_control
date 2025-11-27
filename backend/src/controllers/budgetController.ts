@@ -2,11 +2,10 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import pool from '../database/db';
 
-// Buscar todos os orçamentos do usuário
 export const getBudgets = async (req: AuthRequest, res: Response) => {
   const userId = req.userId;
 
-  // ESTA É A MESMA CONSULTA QUE ACABAMOS DE CRIAR NA TAREFA 36
+  // --- CONSULTA ATUALIZADA PARA INCLUIR O TIPO DA CATEGORIA ---
   const GET_ALL_BUDGETS_WITH_PROGRESS_QUERY = `
     WITH AllBudgets AS (
         SELECT 
@@ -14,6 +13,7 @@ export const getBudgets = async (req: AuthRequest, res: Response) => {
             b.category_id,
             c.name as category_name,
             c.icon as category_icon,
+            c.type as category_type,  
             b.amount as budgeted_amount,
             b.month_date
         FROM budgets b
@@ -27,13 +27,15 @@ export const getBudgets = async (req: AuthRequest, res: Response) => {
             SUM(ABS(t.amount)) as spent_amount
         FROM transactions t
         WHERE t.user_id = $1
-          AND t.amount < 0
+          -- Considera transações que afetam o orçamento (despesas negativas ou poupança)
+          AND (t.amount < 0 OR t.type = 'savings') 
         GROUP BY t.category_id, DATE_TRUNC('month', t.date)
     )
     SELECT
         ab.id,
         ab.category_name,
         ab.category_icon,
+        ab.category_type, -- <--- LINHA ADICIONADA: Retornamos o tipo para o frontend
         ab.month_date,
         ab.budgeted_amount,
         COALESCE(als.spent_amount, 0) as spent_amount
@@ -41,7 +43,7 @@ export const getBudgets = async (req: AuthRequest, res: Response) => {
     LEFT JOIN AllSpending als 
       ON ab.category_id = als.category_id 
       AND ab.month_date = als.transaction_month
-    ORDER BY ab.month_date DESC, ab.category_name;
+    ORDER BY ab.category_type DESC, ab.month_date DESC, ab.category_name;
   `;
 
   try {

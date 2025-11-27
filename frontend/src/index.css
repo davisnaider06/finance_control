@@ -1,101 +1,83 @@
+/* Importando a fonte Inter do Google Fonts para um visual mais moderno */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  --base-font-size: 16px;
-  --border-radius: 16px;
+  /* --- Cores do Tema (Sua Identidade) --- */
+  --primary-blue: #004a99;
+  --primary-blue-dark: #003366;
+  --accent-green: #10b981; /* Verde mais moderno */
+  --accent-red: #ef4444;   /* Vermelho mais moderno */
+
+  /* --- Variáveis de Design System --- */
+  --base-font-family: 'Inter', sans-serif;
+  --border-radius-lg: 16px; /* Cartões */
+  --border-radius-md: 12px; /* Botões, inputs */
   --border-radius-sm: 8px;
 
-  --color-green: #10b981;
-  --color-red: #ef4444;  
-  --color-blue: #3b82f6;  
-  --savings-color: #10b981;
+  /* Sombras modernas e suaves (estilo "elevation") */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-@media (max-width: 600px) {
-  :root {
-    --base-font-size: 14px;
-    --border-radius: 12px;
-  }
-}
-
+/* Tema Claro (Light Mode) - Limpo e Moderno */
 [data-theme="light"] {
-  --bg-primary: #ffffff;    
-  --bg-secondary: #f3f4f6; 
+  --bg-app: #f8fafc;       /* Fundo da aplicação (cinza muito claro) */
+  --bg-surface: #ffffff;   /* Fundo de cartões e elementos */
+  --bg-sidebar: var(--primary-blue);
   
-  --text-primary: #1f2937;  
-  --text-secondary: #6b7280; 
-  --text-muted: #9ca3af;
+  --text-primary: #1e293b;  /* Cinza escuro (quase preto) */
+  --text-secondary: #64748b; /* Cinza médio */
+  --text-on-brand: #ffffff; /* Texto sobre fundo azul */
+
+  --border-color: #e2e8f0;
   
-  --sidebar-bg: #1e3a8a;
-  --sidebar-text: #ffffff;
-  --sidebar-text-muted: #93c5fd; 
-  --sidebar-active-bg: rgba(255, 255, 255, 0.1);
-  
-  --border-color: #e5e7eb; 
-  --header-bg: #ffffff;    
-  --box-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  /* Cores semânticas */
+  --color-success: var(--accent-green);
+  --color-danger: var(--accent-red);
 }
 
+/* Tema Escuro (Dark Mode) - Elegante e Confortável */
 [data-theme="dark"] {
-  --bg-primary: #1f2937;  
-  --bg-secondary: #111827; 
+  --bg-app: #0f172a;       /* Azul marinho muito escuro */
+  --bg-surface: #1e293b;   /* Azul acinzentado escuro */
+  --bg-sidebar: #0f172a;   /* Sidebar se funde com o fundo no dark mode */
+  
+  --text-primary: #f8fafc;  /* Branco */
+  --text-secondary: #94a3b8; /* Cinza azulado claro */
+  --text-on-brand: #f8fafc;
 
-  --text-primary: #f9fafb;    
-  --text-secondary: #d1d5db;
-  --text-muted: #6b7280; 
-
-  --sidebar-bg: #111827;
-  --sidebar-text: #f9fafb;
-  --sidebar-active-bg: #374151;
-
-  --border-color: #374151; 
-  --header-bg: #1f2937;
-  --box-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-  --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --border-color: #334155;
+  
+  --color-success: #34d399; /* Verde mais claro para contraste */
+  --color-danger: #f87171;  /* Vermelho mais claro para contraste */
 }
 
+/* --- Reset e Base --- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* Remove highlight de toque no mobile */
 }
 
 html, body, #root {
   height: 100%;
+  width: 100%;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  background-color: var(--bg-secondary);
+  font-family: var(--base-font-family);
+  background-color: var(--bg-app);
   color: var(--text-primary);
-  font-size: var(--base-font-size);
   line-height: 1.5;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: 16px; /* Base para mobile */
 }
 
-.card {
-    background-color: var(--bg-primary);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    border: 1px solid var(--border-color); 
-    padding: 1.5rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* Utilitários */
+.card-base {
+    background-color: var(--bg-surface);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
 }
-
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--box-shadow-lg);
-}
-
-
-h1, h2, h3 {
-    font-weight: 700;
-    letter-spacing: -0.025em; 
-}
-
-h1 { font-size: 1.8rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.2rem; }

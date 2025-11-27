@@ -1,36 +1,40 @@
-import { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom'; 
+import { useState, useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import styles from './MainLayout.module.css'; 
-import { Header } from './Header/Header'; 
+import { Header } from './Header';
+import styles from './MainLayout.module.css';
 
 export const MainLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const location = useLocation();
-  const openSidebar = () => setIsSidebarOpen(true);
-  const closeSidebar = () => setIsSidebarOpen(false);
 
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [location]);
 
   return (
     <div className={styles.layout}>
-      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-      
+    
+      <Sidebar 
+        isOpen={isMobileSidebarOpen} 
+        onClose={() => setIsMobileSidebarOpen(false)} 
+      />
+
+      {isMobileSidebarOpen && (
+        <div 
+          className={styles.sidebarOverlay} 
+          onClick={() => setIsMobileSidebarOpen(false)} 
+          aria-hidden="true"
+        />
+      )}
+
       <div className={styles.mainWrapper}>
-        <Header onMenuClick={openSidebar} />
+        <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
         
         <main className={styles.content}>
           <Outlet /> 
         </main>
-        {isSidebarOpen && (
-          <div 
-            className={styles.sidebarOverlay} 
-            onClick={closeSidebar}
-            // Adicione um estilo para este overlay no MainLayout.module.css
-            // (position: fixed; top: 0; left: 0; width: 100%; height: 100%; bg: rgba(0,0,0,0.5); z-index: 950;)
-          />
-        )}
       </div>
     </div>
   );

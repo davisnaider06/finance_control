@@ -1,9 +1,10 @@
 #root {
+  /* Garante que o container principal ocupe 100% sem paddings extras */
   width: 100%;
-  padding: 0; 
-  text-align: left;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
-
 .logo {
   height: 6em;
   padding: 1.5em;

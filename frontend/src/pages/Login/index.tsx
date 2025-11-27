@@ -38,7 +38,7 @@ export function Login() {
     <div className={styles.loginPage}>
       <div className={styles.loginFormContainer}>
         <form onSubmit={handleSubmit}>
-          <h2>Entrar no Orçamento Fácil</h2>
+          <h2>Entrar</h2>
           
           {/* Mostra o erro, se houver */}
           {error && <p className={styles.errorMessage}>{error}</p>}
