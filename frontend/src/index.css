@@ -20,21 +20,33 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+@media (max-width: 600px) {
+  :root {
+    --base-font-size: 14px;
+    --border-radius: 12px;
+  }
+}
+
 /* Tema Claro (Light Mode) - Limpo e Moderno */
 [data-theme="light"] {
   --bg-app: #f8fafc;       /* Fundo da aplicação (cinza muito claro) */
   --bg-surface: #ffffff;   /* Fundo de cartões e elementos */
   --bg-sidebar: var(--primary-blue);
   
-  --text-primary: #1e293b;  /* Cinza escuro (quase preto) */
-  --text-secondary: #64748b; /* Cinza médio */
-  --text-on-brand: #ffffff; /* Texto sobre fundo azul */
-
-  --border-color: #e2e8f0;
+  --text-primary: #1f2937;  
+  --text-secondary: #6b7280; 
+  --text-muted: #9ca3af;
   
-  /* Cores semânticas */
-  --color-success: var(--accent-green);
-  --color-danger: var(--accent-red);
+  --sidebar-bg: #1e3a8a;
+  --sidebar-text: #ffffff;
+  --sidebar-text-muted: #93c5fd; 
+  --sidebar-active-bg: rgba(255, 255, 255, 0.1);
+  
+   --border-color: #e5e7eb; 
+  --header-bg: #ffffff;    
+  --box-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Tema Escuro (Dark Mode) - Elegante e Confortável */

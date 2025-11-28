@@ -1,37 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import { Header } from './Header/Header.tsx';
+import { Header } from './Header/Header';
 import styles from './MainLayout.module.css';
 
 export const MainLayout = () => {
-
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
 
-  useEffect(() => {
-    setIsMobileSidebarOpen(false);
-  }, [location]);
+  const openSidebar = () => setIsSidebarOpen(true);
+  const closeSidebar = () => setIsSidebarOpen(false);
+
 
   return (
     <div className={styles.layout}>
-    
-      <Sidebar 
-        isOpen={isMobileSidebarOpen} 
-        onClose={() => setIsMobileSidebarOpen(false)} 
-      />
-
-      {isMobileSidebarOpen && (
-        <div 
-          className={styles.sidebarOverlay} 
-          onClick={() => setIsMobileSidebarOpen(false)} 
-          aria-hidden="true"
-        />
-      )}
+     <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+      
 
       <div className={styles.mainWrapper}>
-        <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
-        
+        <Header onMenuClick={openSidebar} />
         <main className={styles.content}>
           <Outlet /> 
         </main>
